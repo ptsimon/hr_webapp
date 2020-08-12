@@ -50,4 +50,9 @@ $(document).ready(function() {
             )
         }
     });
+
+    $(".reset-btn").click(function(){
+        $("#search_form").trigger("reset");
+        $(':input').val('');
+    });
 } );

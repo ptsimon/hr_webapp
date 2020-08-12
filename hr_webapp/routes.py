@@ -36,11 +36,13 @@ def index():
                     )
     elif request.method == 'POST':
         user_id = request.form['user_id']
+        month = request.form['month']
+        project_id = request.form['project_id']
+        print (request.form)
+
         query = Checkin.query.filter_by(user_id=user_id).order_by(Checkin.date).all()
-        values = {
-            "user_id": user_id
-        }
-        return render_template('index.html', checkins=query, values=values)
+        
+        return render_template('index.html', checkins=query, values=request.form)
 
 @app.route('/uploadcsv', methods=['GET', 'POST'])
 def upload_csv():
