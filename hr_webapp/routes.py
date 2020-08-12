@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from hr_webapp import app
 from hr_webapp.models import Checkin
+from sqlalchemy import extract
 
 from io import TextIOWrapper
 import csv
@@ -35,12 +36,14 @@ def index():
                     # json_checkins=json_checkins
                     )
     elif request.method == 'POST':
-        user_id = request.form['user_id']
-        month = request.form['month']
-        project_id = request.form['project_id']
         print (request.form)
 
-        query = Checkin.query.filter_by(user_id=user_id).order_by(Checkin.date).all()
+        filters = {k: v for k, v in request.form.items() if v != '' and k != 'month'}
+        query = Checkin.query.filter_by(**filters).order_by(Checkin.date)
+
+        if request.form['month']:
+            year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
+            query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month)
         
         return render_template('index.html', checkins=query, values=request.form)
 

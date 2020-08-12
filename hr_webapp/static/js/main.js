@@ -14,7 +14,7 @@ $(document).ready(function() {
         }],
 
         //make it scrollable rather than paged
-        scrollY: 500,
+        scrollY: 400,
         scrollX: true,
         scrollCollapse: true,
         paging: false,
