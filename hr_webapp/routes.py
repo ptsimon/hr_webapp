@@ -8,7 +8,7 @@ import csv
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
-        latest_checkins = Checkin.query.order_by(Checkin.date).limit(10).all()
+        latest_checkins = Checkin.query.order_by(Checkin.date).limit(100).all()
         return render_template('index.html', checkins=latest_checkins)
     elif request.method == 'POST':
         user_id = request.form['user_id']
