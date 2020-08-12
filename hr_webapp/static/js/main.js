@@ -1,6 +1,5 @@
 $(document).ready(function() {
     $('#checkin-table').DataTable( {
-        deferRender: true,
         order: [[0, 'desc']],
         responsive: true,
         searching: false,
@@ -8,7 +7,6 @@ $(document).ready(function() {
         // rowGroup: {
         //     dataSrc: 0
         // },
-        
         "aaSorting": [],
         columnDefs: [{
             orderable: false,
@@ -20,6 +18,10 @@ $(document).ready(function() {
         scrollX: true,
         scrollCollapse: true,
         paging: false,
+
+        //increase performance, load faster
+        // ajax: json_checkins,
+        deferRender: true,
 
         //calculate total number of hours
         dom: '<"top">rt<"bottom"lfp><"clear">',

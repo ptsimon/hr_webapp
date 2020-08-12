@@ -9,5 +9,8 @@ class Checkin(db.Model):
     user_id = db.Column(db.Integer, nullable=False)
     hours = db.Column(db.Integer, nullable=False)
 
+    def as_dict(self):
+       return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     def __repr__(self):
-        return '<CheckIn %r>' % (str(self.date), str(self.user_id), str(self.hours))
+        return f"CheckIn('{strself.date}', '{self.user_id}', '{self.hours}')"
