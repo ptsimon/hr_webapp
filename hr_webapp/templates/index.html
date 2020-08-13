@@ -23,13 +23,14 @@
       <input type="number" class="form-control" name="project_id" value="{{ values.project_id }}">
     </div>
   </div>
+  <a href={{ url_for('upload_csv') }}>Upload CSV</a>
   <div class = "float-right">
     <button type="submit" class="btn btn-primary">Submit</button>
     <button type="button" class="reset-btn btn btn-outline-dark">Clear</button>
   </div>
   </form>
 
-<br><br>
+<br>
 <table id="checkin-table" class="table table-striped table-hover table-bordered" style="width:100%">
   <thead>
       <tr>
