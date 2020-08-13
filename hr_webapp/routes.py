@@ -11,14 +11,13 @@ import os
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
 import json
-json_file = os.getcwd()+'/hr_webapp/data.txt'
 
+# json_file = os.getcwd()+'/hr_webapp/data.txt'
 global json_data
 
 @app.route('/data')
 def returnData(*query):
     
-    # print (type(jsonify(document.read())))
     # with open(json_file) as jsonfile:
     #     return json.load(jsonfile)
 
@@ -30,7 +29,6 @@ def returnData(*query):
     else:
         return json_data
 
-    # return jsonify(for_datatables)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -72,6 +70,7 @@ def index():
         returnData(query)
         
         return render_template('index.html', checkins=query, values=request.form)
+
 
 @app.route('/uploadcsv', methods=['GET', 'POST'])
 def upload_csv():
