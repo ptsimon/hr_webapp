@@ -1,7 +1,9 @@
 from flask import render_template, request, redirect, url_for, jsonify
 from hr_webapp import app
 from hr_webapp.models import Checkin
+from hr_webapp import db
 from sqlalchemy import extract
+from datetime import datetime
 
 from io import TextIOWrapper
 import csv
@@ -29,7 +31,7 @@ import csv
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
-        latest_checkins = Checkin.query.order_by(Checkin.date).limit(50).all()
+        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(50).all()
         # json_checkins = json.dumps(latest_checkins, cls=AlchemyEncoder)
         return render_template('index.html', 
                     checkins=latest_checkins, values={}, 
@@ -37,13 +39,19 @@ def index():
                     )
     elif request.method == 'POST':
         print (request.form)
-
+        query = Checkin.query
         filters = {k: v for k, v in request.form.items() if v != '' and k != 'month'}
-        query = Checkin.query.filter_by(**filters).order_by(Checkin.date)
+        
+        #if empty form values
+        if not filters and request.form['month']=='':
+            return redirect(url_for('index'))
+        
+        if request.form['user_id'] or request.form['project_id']:
+            query = query.filter_by(**filters).order_by(Checkin.date)
 
         if request.form['month']:
             year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
-            query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month)
+            query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
         
         return render_template('index.html', checkins=query, values=request.form)
 
@@ -56,7 +64,7 @@ def upload_csv():
         for row in csv_reader:
             if row[0] != "date":
                 
-                checkin = EmployeeCheckin(
+                checkin = Checkin(
                             date=datetime.strptime(row[0], '%Y-%m-%d').date(),
                             project_id=row[1],
                             manager_id=row[2],
@@ -64,11 +72,13 @@ def upload_csv():
                             hours=row[4])
                 db.session.add(checkin)
                 db.session.commit()
-        # return redirect('/uploadcsv')
+                
         return redirect(url_for('upload_csv'))
+
     return """
-            <form method='post' action='/' enctype='multipart/form-data'>
+            <form method='post' action='/uploadcsv' enctype='multipart/form-data'>
               Upload a csv file: <input type='file' name='file'>
               <input type='submit' value='Upload'>
             </form>
+            <a href="/">Go Back</a>
            """  
