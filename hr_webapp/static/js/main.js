@@ -1,12 +1,27 @@
 $(document).ready(function() {
     $('#checkin-table').DataTable( {
+
+        //to increase performance/load data faster
+            //--failed attempt? mabagal pa rin haha :((
+        deferRender: true,
+        processing: true,
+        serverSide: true,
+        ajax: {url: "/data"},
+        columns: [
+            { data: 'date' },
+            { data: 'project_id' },
+            { data: 'manager_id' },
+            { data: 'user_id' },
+            { data: 'hours' }
+        ],
+
         order: [[0, 'desc']], //column to order, descending
         responsive: true, //mobile friendly
         searching: false, //disable search bar
         select: true, //enable row selection
 
-        //make it scrollable rather than paged
-        scrollY: 400,
+        //make it scrollable
+        scrollY: 500,
         scrollX: true,
         scrollCollapse: true,
         paging: false,
@@ -47,7 +62,6 @@ $(document).ready(function() {
                     .data()
                     .pluck('hours')
                     .reduce( function (a, b) {
-                        console.log(a,b);
                         return a + b*1;
                     }, 0);
 
@@ -83,19 +97,6 @@ $(document).ready(function() {
                 totalHours
             )
         },
-
-        //increase performance, load faster
-        deferRender: true,
-        processing: true,
-        serverSide: true,
-        ajax: {url: "/data"},
-        columns: [
-            { data: 'date' },
-            { data: 'project_id' },
-            { data: 'manager_id' },
-            { data: 'user_id' },
-            { data: 'hours' }
-        ]
     });
 
     $(".reset-btn").click(function(){

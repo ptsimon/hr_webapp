@@ -7,47 +7,54 @@ from datetime import datetime
 
 from io import TextIOWrapper
 import csv
+import os
 
 from sqlalchemy.ext.declarative import DeclarativeMeta
 import json
-class AlchemyEncoder(json.JSONEncoder):
+json_file = os.getcwd()+'/hr_webapp/data.txt'
 
-    def default(self, obj):
-        if isinstance(obj.__class__, DeclarativeMeta):
-            # an SQLAlchemy class
-            fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-                data = obj.__getattribute__(field)
-                try:
-                    json.dumps(data) # this will fail on non-encodable values, like other classes
-                    fields[field] = data
-                except TypeError:
-                    fields[field] = None
-            # a json-encodable dict
-            return fields
-
-        return json.JSONEncoder.default(self, obj)
+global json_data
 
 @app.route('/data')
-def data():
-    latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(50).all()
-    list_dict = [x.as_dict() for x in latest_checkins]
-    for_datatables = {'data': list_dict}
-    print("aaa", for_datatables['data'][0]['date'])
-    return (jsonify(for_datatables))
+def returnData(*query):
+    
+    # print (type(jsonify(document.read())))
+    # with open(json_file) as jsonfile:
+    #     return json.load(jsonfile)
+
+    if query:
+        list_dict = [x.as_dict() for x in query[0]]
+        for_datatables = {'data': list_dict}
+        global json_data
+        json_data = jsonify(for_datatables)
+    else:
+        return json_data
+
+    # return jsonify(for_datatables)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    # def datehandler(o):
+    #     # if type(o) is datetime.date:
+    #     #     return o.__str__()
+    #     # # if isinstance(o, datetime):
+    #     # #     return o.__str__()
+    #     return o.__str__()
+
+    # def writeToJSON(query):
+    #     list_dict = [x.as_dict() for x in query]
+    #     for_datatables = {'data': list_dict}
+
+    #     with open(json_file, 'w') as outfile:
+    #         json.dump(for_datatables, outfile, default=datehandler)
+
     if request.method == 'GET':
-        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(50).all()
-        print 
-        # return (jsonify(json_checkins))
-        return render_template('index.html', 
-                    checkins=latest_checkins, values={}, 
-                    # json_checkins=json_checkins
-                    )
+        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
+        returnData(latest_checkins)
+        
+        return render_template('index.html', checkins=latest_checkins, values={})
+                    
     elif request.method == 'POST':
-        print (request.form)
         query = Checkin.query
         filters = {k: v for k, v in request.form.items() if v != '' and k != 'month'}
         
@@ -61,6 +68,8 @@ def index():
         if request.form['month']:
             year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
             query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
+        
+        returnData(query)
         
         return render_template('index.html', checkins=query, values=request.form)
 
