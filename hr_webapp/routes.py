@@ -8,31 +8,40 @@ from datetime import datetime
 from io import TextIOWrapper
 import csv
 
-# from sqlalchemy.ext.declarative import DeclarativeMeta
-# import json
-# class AlchemyEncoder(json.JSONEncoder):
+from sqlalchemy.ext.declarative import DeclarativeMeta
+import json
+class AlchemyEncoder(json.JSONEncoder):
 
-#     def default(self, obj):
-#         if isinstance(obj.__class__, DeclarativeMeta):
-#             # an SQLAlchemy class
-#             fields = {}
-#             for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-#                 data = obj.__getattribute__(field)
-#                 try:
-#                     json.dumps(data) # this will fail on non-encodable values, like other classes
-#                     fields[field] = data
-#                 except TypeError:
-#                     fields[field] = None
-#             # a json-encodable dict
-#             return fields
+    def default(self, obj):
+        if isinstance(obj.__class__, DeclarativeMeta):
+            # an SQLAlchemy class
+            fields = {}
+            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
+                data = obj.__getattribute__(field)
+                try:
+                    json.dumps(data) # this will fail on non-encodable values, like other classes
+                    fields[field] = data
+                except TypeError:
+                    fields[field] = None
+            # a json-encodable dict
+            return fields
 
-#         return json.JSONEncoder.default(self, obj)
+        return json.JSONEncoder.default(self, obj)
+
+@app.route('/data')
+def data():
+    latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(50).all()
+    list_dict = [x.as_dict() for x in latest_checkins]
+    for_datatables = {'data': list_dict}
+    print("aaa", for_datatables['data'][0]['date'])
+    return (jsonify(for_datatables))
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'GET':
         latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(50).all()
-        # json_checkins = json.dumps(latest_checkins, cls=AlchemyEncoder)
+        print 
+        # return (jsonify(json_checkins))
         return render_template('index.html', 
                     checkins=latest_checkins, values={}, 
                     # json_checkins=json_checkins

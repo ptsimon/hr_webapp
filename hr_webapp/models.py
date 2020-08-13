@@ -13,4 +13,4 @@ class Checkin(db.Model):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-        return f"CheckIn('{strself.date}', '{self.user_id}', '{self.hours}')"
+        return f"CheckIn('{self.date}', '{self.user_id}', '{self.hours}')"
