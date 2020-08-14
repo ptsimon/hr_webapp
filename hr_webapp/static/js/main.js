@@ -4,27 +4,28 @@ $(document).ready(function() {
         //to increase performance/load data faster
             //--failed attempt? mabagal pa rin haha :((
         deferRender: true,
-        processing: true,
-        serverSide: true,
-        ajax: {url: "/data"},
-        columns: [
-            { data: 'date' },
-            { data: 'project_id' },
-            { data: 'manager_id' },
-            { data: 'user_id' },
-            { data: 'hours' }
-        ],
+        // processing: true,
+        // serverSide: true,
+        // ajax: {url: "/data"},
+        // columns: [
+        //     { data: 'date' },
+        //     { data: 'project_id' },
+        //     { data: 'manager_id' },
+        //     { data: 'user_id' },
+        //     { data: 'hours' }
+        // ],
 
-        order: [[0, 'desc']], //column to order, descending
+
+        aaSorting: [[ 0, "desc" ]], //column to order, descending
         responsive: true, //mobile friendly
         searching: false, //disable search bar
         select: true, //enable row selection
 
         //make it scrollable
-        scrollY: 500,
-        scrollX: true,
-        scrollCollapse: true,
-        paging: false,
+        // scrollY: 500,
+        // scrollX: true,
+        // scrollCollapse: true,
+        // paging: false,
 
         columnDefs: [
             { 
@@ -33,25 +34,30 @@ $(document).ready(function() {
                 targets: [2, 3, 4] //index of columns
             },
             {
-                //change date format (removed time)
-                "render": function ( data ) {
-                    date_display = data.match(/(\w+(?:[, ])+){4}/gm);
+                // //change date format (removed time)
+                // "render": function ( data ) {
+                //     date_display = data.match(/(\w+(?:[, ])+){4}/gm);
                     
-                    return date_display;
-                },
-                "targets": 0
+                //     return date_display;
+                // },
+                // "targets": 0
              }
         ],
 
         rowGroup: {
             // grouping rows based in their month-year
             dataSrc: function ( row ) {
-                var date = row['date'].split(" ");
-                var month = date[2];
-                var year = date[3];
+                var date = row[0].split("-");
+                var month = date[1]*1;
+                var year = date[0];
+
+                var months = [ "January", "February", "March", "April", "May", "June", 
+                            "July", "August", "September", "October", "November", "December" ];
+
+                var selectedMonthName = months[month-1];
 
                 //this value is passed as 'group' in the startRender
-                return "" + month + ' ' + year; 
+                return "" + selectedMonthName + ' ' + year; 
             },
             startRender: function ( rows, group ) {
                 month = group.split(" ")[0];
@@ -60,7 +66,8 @@ $(document).ready(function() {
                 // compute total hours for the group(month)
                 var totalHours = rows
                     .data()
-                    .pluck('hours')
+                    // .pluck('hours')
+                    .pluck(4)
                     .reduce( function (a, b) {
                         return a + b*1;
                     }, 0);
@@ -77,7 +84,7 @@ $(document).ready(function() {
         },
 
         //calculate total number of hours
-        dom: '<"top">rt<"bottom"lfp><"clear">',
+        // dom: '<"top">rt<"bottom"lfp><"clear">',
         footerCallback: function (row, data, start, end, display) {
             var api = this.api(), data;
 
