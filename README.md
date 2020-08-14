@@ -5,7 +5,7 @@ A Python Flask backend is used to talk to a SQLite database through SQLAlchemy a
 
 ## Setup
 1. Ensure you have Python 3 installed (project was developed using Python 3.8). Installation instructions are provided [here](http://docs.python-guide.org/en/latest/starting/installation/).
-2. Ensure you have `virtualenv` or `venv` (I used venv) installed as a virtual environment will be needed to run the Flask server. Installation instructions can be found [here](https://virtualenv.pypa.io/en/stable/installation/).
+2. Ensure you have `virtualenv` or `venv` (I used venv) installed as a virtual environment will be needed to run the Flask server. Installation instructions can be found [here](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/).
 3. Create a virtualenv in the root of the project and install requirements:
 ```
 $ python3 -m venv env
