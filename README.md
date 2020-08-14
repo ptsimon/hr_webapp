@@ -1,4 +1,5 @@
 # Employee Check-In Manager
+For Thinking Machines Enterprise Solutions Engineering L1 Exam
 This web application displays and searched through employee check-in logs, uploads csv files to database, and logs a check-in. 
 
 A Python Flask backend is used to talk to a SQLite database through SQLAlchemy and Bootstrap is used to format the forms and tables.
