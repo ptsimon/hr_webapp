@@ -1,9 +1,9 @@
-from flask import render_template, request, redirect, url_for, jsonify
+from flask import render_template, request, redirect, url_for, jsonify, flash
 from hr_webapp import app
 from hr_webapp.models import Checkin
 from hr_webapp import db
 from sqlalchemy import extract
-from datetime import datetime
+from datetime import datetime, date
 
 from io import TextIOWrapper
 import csv
@@ -99,3 +99,30 @@ def upload_csv():
             </form>
             <a href="/">Go Back</a>
            """  
+
+@app.route('/checkin', methods=['GET', 'POST'])
+def check_in():
+    error = None
+    if request.method == 'POST':
+        try:
+            if request.form['date']==str(date.today()):
+                form_date = datetime.utcnow()
+            else:
+                form_date = datetime.strptime(request.form['date'], '%Y-%m-%d')
+
+            new_log = Checkin(
+                date=form_date,
+                user_id=request.form['user_id'],
+                manager_id=request.form['manager_id'],
+                project_id=request.form['project_id'],
+                hours=request.form['hours'],
+            )
+            db.session.add(new_log)
+            db.session.commit()
+
+            flash('Check-in success')
+            return redirect(url_for('check_in'))
+        except:
+            error='Check-in error. Please try again.'
+
+    return render_template('checkin.html', date_now=date.today(), error=error)
