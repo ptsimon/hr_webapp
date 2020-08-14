@@ -53,7 +53,7 @@ def index():
         return render_template('index.html', checkins=latest_checkins, values={})
                     
     elif request.method == 'POST':
-        query = Checkin.query
+        query = Checkin.query.order_by(Checkin.date.desc())
         filters = {k: v for k, v in request.form.items() if v != '' and k != 'month'}
         
         #if empty form values
@@ -61,7 +61,7 @@ def index():
             return redirect(url_for('index'))
         
         if request.form['user_id'] or request.form['project_id']:
-            query = query.filter_by(**filters).order_by(Checkin.date)
+            query = query.filter_by(**filters)
 
         if request.form['month']:
             year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
