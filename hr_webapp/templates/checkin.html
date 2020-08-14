@@ -23,19 +23,23 @@
             <div class="px-2">
                 <form action="{{ url_for('check_in') }}" method='POST' class="justify-content-center">
                     <div class="form-group">
-                        <input type="date" class="form-control" name="date" value="{{ date_now }}" required autofocus>
+                        <input type="date" class="form-control" name="date" value="{{ date_now }}" required >
                     </div>
                     <div class="form-group">
-                        <input type="number" class="form-control" name="user_id" placeholder="Employee ID" required>
+                        <label for="month">Employee ID:</label>
+                        <input type="number" class="form-control" name="user_id" required autofocus>
                     </div>
                     <div class="form-group">
-                        <input type="number" class="form-control" name="manager_id" placeholder="Manager ID" required>
+                        <label for="month">Manager ID:</label>
+                        <input type="number" class="form-control" name="manager_id" required>
                     </div>
                     <div class="form-group">
-                        <input type="number" class="form-control" name="project_id" placeholder="Project ID" required>
+                        <label for="month">Project ID:</label>
+                        <input type="number" class="form-control" name="project_id" required>
                     </div>
                     <div class="form-group">
-                        <input type="number" class="form-control" name="hours" placeholder="Hours" required>
+                        <label for="month">Hours:</label>
+                        <input type="number" class="form-control" name="hours" required>
                     </div>
                     
                     <button type="submit" class="btn btn-primary">Check-In</button>
