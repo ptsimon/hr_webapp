@@ -6,11 +6,7 @@ from sqlalchemy import extract
 from datetime import datetime, date
 
 from io import TextIOWrapper
-import csv
-import os
-
-from sqlalchemy.ext.declarative import DeclarativeMeta
-import json
+import csv, os, json, re, ast
 
 # json_file = os.getcwd()+'/hr_webapp/data.txt'
 global json_data
@@ -46,14 +42,43 @@ def index():
     #     with open(json_file, 'w') as outfile:
     #         json.dump(for_datatables, outfile, default=datehandler)
 
+    page = request.args.get('page', 1, type=int)
+    values = request.args.get('values', None)
     if request.method == 'GET':
-        page = request.args.get('page', 1, type=int)
 
-        # latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
-        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).paginate(page=page)
-        # returnData(latest_checkins)
+        if not values:
+            # latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
+            latest_checkins = Checkin.query.order_by(Checkin.date.desc()).paginate(page=page)
+            # returnData(latest_checkins)
+            
+            return render_template('index.html', checkins=latest_checkins, values={}, page=page)
         
-        return render_template('index.html', checkins=latest_checkins, values={}, page=page)
+        else:
+            query = Checkin.query.order_by(Checkin.date.desc())
+            print ("AAAAAAAAA", values, type(values))
+            search = re.search(r"\[(.*)\]", values) #get the values
+            if search:
+                values = search.group()
+            values = dict(ast.literal_eval(values)) #dict it
+
+            filters = {k: int(v) for k, v in values.items() if v != '' and k != 'month'} #remove empty values
+            print("yoyooyo", filters)
+            
+            #if empty form values
+            if not filters and values['month']=='':
+                return redirect(url_for('index'))
+            
+            if values['user_id'] or values['project_id']:
+                query = query.filter_by(**filters)
+
+            if values['month']:
+                year, month = [int(x.lstrip('0')) for x in values['month'].split('-')]
+                query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
+            
+            # returnData(query)
+            query = query.paginate(page=page)
+            
+            return render_template('index.html', checkins=query, values=values, page=page)
                     
     elif request.method == 'POST':
         query = Checkin.query.order_by(Checkin.date.desc())
@@ -70,9 +95,10 @@ def index():
             year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
             query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
         
-        returnData(query)
+        # returnData(query)
+        query = query.paginate(page=page)
         
-        return render_template('index.html', checkins=query, values=request.form)
+        return render_template('index.html', checkins=query, values=request.form, page=page)
 
 
 @app.route('/uploadcsv', methods=['GET', 'POST'])

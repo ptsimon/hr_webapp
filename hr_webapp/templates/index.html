@@ -59,10 +59,20 @@
         
         {% if page_num %}
         
-          {% if checkins.page == page_num %}
-            <a class="btn btn-dark" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+          {% if values %}
+            {% if checkins.page == page_num %}
+              <a class="btn btn-dark" href="{{ url_for('index', page=page_num, values=values) }}">{{ page_num }}</a>
+            {% else %}
+              <a class="btn btn-outline-dark" href="{{ url_for('index', page=page_num, values=values) }}">{{ page_num }}</a>
+            {% endif %} 
+
           {% else %}
-            <a class="btn btn-outline-dark" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+            {% if checkins.page == page_num %}
+              <a class="btn btn-dark" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+            {% else %}
+              <a class="btn btn-outline-dark" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+
           {% endif %}
           
         {% else %}
