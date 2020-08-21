@@ -25,7 +25,8 @@ $(document).ready(function() {
         // scrollY: 500,
         // scrollX: true,
         // scrollCollapse: true,
-        // paging: false,
+        paging: false,
+        "bInfo" : false,
 
         columnDefs: [
             { 
