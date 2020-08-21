@@ -44,61 +44,66 @@ def index():
 
     page = request.args.get('page', 1, type=int)
     values = request.args.get('values', None)
-    if request.method == 'GET':
 
-        if not values:
-            # latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
-            latest_checkins = Checkin.query.order_by(Checkin.date.desc()).paginate(page=page)
-            # returnData(latest_checkins)
-            
-            return render_template('index.html', checkins=latest_checkins, values={}, page=page)
+    if request.method == 'GET' and not values:
+        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).paginate(page=page)
         
+        return render_template('index.html', checkins=latest_checkins, values={}, page=page)
+    
+    else:
+        query = Checkin.query.order_by(Checkin.date.desc())
+        if request.method == 'POST':
+            values = request.form
         else:
-            query = Checkin.query.order_by(Checkin.date.desc())
-            print ("AAAAAAAAA", values, type(values))
             search = re.search(r"\[(.*)\]", values) #get the values
             if search:
                 values = search.group()
             values = dict(ast.literal_eval(values)) #dict it
 
-            filters = {k: int(v) for k, v in values.items() if v != '' and k != 'month'} #remove empty values
-            print("yoyooyo", filters)
-            
-            #if empty form values
-            if not filters and values['month']=='':
-                return redirect(url_for('index'))
-            
-            if values['user_id'] or values['project_id']:
-                query = query.filter_by(**filters)
-
-            if values['month']:
-                year, month = [int(x.lstrip('0')) for x in values['month'].split('-')]
-                query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
-            
-            # returnData(query)
-            query = query.paginate(page=page)
-            
-            return render_template('index.html', checkins=query, values=values, page=page)
-                    
-    elif request.method == 'POST':
-        query = Checkin.query.order_by(Checkin.date.desc())
-        filters = {k: v for k, v in request.form.items() if v != '' and k != 'month'}
+        filters = {k: int(v) for k, v in values.items() if v != '' and k != 'month'} #remove empty values
         
         #if empty form values
-        if not filters and request.form['month']=='':
+        if not filters and values['month']=='':
             return redirect(url_for('index'))
         
-        if request.form['user_id'] or request.form['project_id']:
+        if values['user_id'] or values['project_id']:
             query = query.filter_by(**filters)
 
-        if request.form['month']:
-            year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
+        if values['month']:
+            year, month = [int(x.lstrip('0')) for x in values['month'].split('-')]
             query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
         
-        # returnData(query)
         query = query.paginate(page=page)
         
-        return render_template('index.html', checkins=query, values=request.form, page=page)
+        return render_template('index.html', checkins=query, values=values, page=page)
+
+    # if request.method == 'GET':
+
+    #     # latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
+    #     latest_checkins = Checkin.query.order_by(Checkin.date.desc()).paginate(page=page)
+    #     # returnData(latest_checkins)
+        
+    #     return render_template('index.html', checkins=latest_checkins, values={}, page=pa
+                    
+    # elif request.method == 'POST':
+    #     query = Checkin.query.order_by(Checkin.date.desc())
+    #     filters = {k: v for k, v in request.form.items() if v != '' and k != 'month'}
+        
+    #     #if empty form values
+    #     if not filters and request.form['month']=='':
+    #         return redirect(url_for('index'))
+        
+    #     if request.form['user_id'] or request.form['project_id']:
+    #         query = query.filter_by(**filters)
+
+    #     if request.form['month']:
+    #         year, month = [int(x.lstrip('0')) for x in request.form['month'].split('-')]
+    #         query = query.filter(extract('year', Checkin.date)==year).filter(extract('month', Checkin.date)==month).order_by(Checkin.date)
+        
+    #     # returnData(query)
+    #     query = query.paginate(page=page)
+        
+    #     return render_template('index.html', checkins=query, values=request.form, page=page)
 
 
 @app.route('/uploadcsv', methods=['GET', 'POST'])
