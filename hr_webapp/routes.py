@@ -47,10 +47,13 @@ def index():
     #         json.dump(for_datatables, outfile, default=datehandler)
 
     if request.method == 'GET':
-        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
-        returnData(latest_checkins)
+        page = request.args.get('page', 1, type=int)
+
+        # latest_checkins = Checkin.query.order_by(Checkin.date.desc()).limit(100).all()
+        latest_checkins = Checkin.query.order_by(Checkin.date.desc()).paginate(page=page)
+        # returnData(latest_checkins)
         
-        return render_template('index.html', checkins=latest_checkins, values={})
+        return render_template('index.html', checkins=latest_checkins, values={}, page=page)
                     
     elif request.method == 'POST':
         query = Checkin.query.order_by(Checkin.date.desc())

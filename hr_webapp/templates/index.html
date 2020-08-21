@@ -43,7 +43,8 @@
       </tr>
   </thead>
   <tbody>      
-      {% for checkin in checkins %}
+
+      {% for checkin in checkins.items %}
         <tr>
           <td>{{ checkin.date }}</td>
           <td>{{ checkin.project_id }}</td>
@@ -52,6 +53,25 @@
           <td>{{ checkin.hours }}</td>
         </tr>
       {% endfor %}
+
+      
+      {% for page_num in checkins.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        
+        {% if page_num %}
+        
+          {% if checkins.page == page_num %}
+            <a class="btn btn-dark" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+          {% else %}
+            <a class="btn btn-outline-dark" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+          {% endif %}
+          
+        {% else %}
+          ...
+        {% endif %}
+          
+      {% endfor %}
+        
+        
 
       <tfoot>
         <tr>
