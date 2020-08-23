@@ -1,0 +1,8 @@
+08-22-20 commit 84ba53b
+
+Problem: total hours only counts the hours for the current page, not all data.
+Possible solution: query the sum of hours in the routes.py, then pass it to index.html.
+Setbacks: monthly total hours cannot be counted (?) no solution i can think of so far....
+
+SQLAlchemy pagination setbacks: inaccurate TOTAL HOURS!!!!!!
+possiblt solution: try JS pagination???
